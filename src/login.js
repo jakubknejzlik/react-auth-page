@@ -59,7 +59,7 @@ class Login extends  Component{
       authProviders = this.props.authProviders.map(provider => {
         if(providers[provider]){
           return (
-            <a href="#" className={`btn btn-block btn-social ${providers[provider].classNameButton} btn-flat`}>Name
+            <a href="#" className={`btn btn-block btn-social ${providers[provider].classNameButton} btn-flat`}>
               <i className={`fa ${providers[provider].classNameFA}`}></i>
               {providers[provider].title}
             </a>
