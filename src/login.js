@@ -2,6 +2,19 @@ import React, { Component } from 'react';
 import { Checkbox } from "react-icheck";
 import "./Login.css";
 
+let providers = {
+  facebook: {
+    title: "Sign in using Facebook",
+    classNameButton: "btn-facebook",
+    classNameFA: "fa fa-facebook"
+  },
+  google: {
+    title: "Sign in using Google+",
+    classNameButton: "btn-google",
+    classNameFA: "fa-google-plus"
+  },
+}
+
 class Login extends  Component{
   constructor(props){
     super(props);
@@ -44,23 +57,15 @@ class Login extends  Component{
     let authProviders = [];
     if(this.props.authProviders.length > 0){
       authProviders = this.props.authProviders.map(provider => {
-        switch (provider){
-          case "facebook":
-            return (
-              <a href="#" className="btn btn-block btn-social btn-facebook btn-flat">Name
-                <i className="fa fa-facebook"></i> Name
-                Sign in using Facebook
-              </a>
-            );
-          case "google":
-            return (
-              <a href="#" className="btn btn-block btn-social btn-google btn-flat">Name
-                <i className="fa fa-google-plus"></i> Sign in using
-                Google+
-              </a>
-            );
-          default:
-            return;
+        if(providers[provider]){
+          return (
+            <a href="#" className={`btn btn-block btn-social ${providers[provider].classNameButton} btn-flat`}>Name
+              <i className={`fa ${providers[provider].classNameFA}`}></i>
+              {providers[provider].title}
+            </a>
+          );
+        } else {
+          return;
         }
       })
     }
@@ -68,10 +73,7 @@ class Login extends  Component{
   }
   
   render(){
-    let flagShowOR = true;
-    if(!this.props.userCredentialsEnabled || this.props.authProviders.length === 0){
-      flagShowOR = false;
-    }
+    let flagShowOR = !this.props.userCredentialsEnabled || this.props.authProviders.length === 0;
     
     return(
       <div className="hold-transition login-page">
@@ -84,11 +86,13 @@ class Login extends  Component{
             {this.renderUserCredentialsEnabled()}
             <div className="social-auth-links text-center">
               {
-                flagShowOR ? <p>- OR -</p> : ''
+                !flagShowOR ? <p>- OR -</p> : ''
               }
               {this.renderAuthProviders()}
             </div>
-            <a href="#">I forgot my password</a>
+            {
+              this.props.userCredentialsEnabled ? <a href="#">I forgot my password</a> : ''
+            }
             <br/>
             <a href="#" className="text-center">Register a new membership</a>
           </div>
