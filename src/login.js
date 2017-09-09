@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import { Checkbox } from "react-icheck";
 import "./Login.css";
 
@@ -13,24 +13,33 @@ let providers = {
     classNameButton: "btn-google",
     classNameFA: "fa-google-plus"
   },
-}
+  gitlab: {
+    title: "Sign in using Gitlab",
+    classNameButton: "btn-gitlab",
+    classNameFA: "fa-gitlab"
+  }
+};
 
-class Login extends  Component{
-  constructor(props){
+class Login extends Component {
+  constructor(props) {
     super(props);
   }
-  
-  renderUserCredentialsEnabled(){
-    if(this.props.userCredentialsEnabled){
+
+  renderUserCredentialsEnabled() {
+    if (this.props.userCredentialsEnabled) {
       return (
         <form action="#" method="post">
           <div className="form-group has-feedback">
-            <input type="email" className="form-control" placeholder="Email"></input>
-            <span className="glyphicon glyphicon-envelope form-control-feedback"></span>
+            <input type="email" className="form-control" placeholder="Email" />
+            <span className="glyphicon glyphicon-envelope form-control-feedback" />
           </div>
           <div className="form-group has-feedback">
-            <input type="password" className="form-control" placeholder="Password"></input>
-            <span className="glyphicon glyphicon-lock form-control-feedback"></span>
+            <input
+              type="password"
+              className="form-control"
+              placeholder="Password"
+            />
+            <span className="glyphicon glyphicon-lock form-control-feedback" />
           </div>
           <div className="row">
             <div className="col-xs-8">
@@ -43,58 +52,73 @@ class Login extends  Component{
               </div>
             </div>
             <div className="col-xs-4">
-              <button type="submit" className="btn btn-primary btn-block btn-flat">Sign In</button>
+              <button
+                type="submit"
+                className="btn btn-primary btn-block btn-flat"
+              >
+                Sign In
+              </button>
             </div>
           </div>
         </form>
       );
     } else {
-      return (<div></div>);
+      return <div />;
     }
   }
-  
-  renderAuthProviders(){
+
+  renderAuthProviders() {
     let authProviders = [];
-    if(this.props.authProviders.length > 0){
+    if (this.props.authProviders.length > 0) {
       authProviders = this.props.authProviders.map(provider => {
-        if(providers[provider]){
+        if (providers[provider]) {
           return (
-            <a href="#" className={`btn btn-block btn-social ${providers[provider].classNameButton} btn-flat`}>
-              <i className={`fa ${providers[provider].classNameFA}`}></i>
+            <a
+              href="#"
+              className={`btn btn-block btn-social ${providers[provider]
+                .classNameButton} btn-flat`}
+            >
+              <i className={`fa ${providers[provider].classNameFA}`} />
               {providers[provider].title}
             </a>
           );
         } else {
           return;
         }
-      })
+      });
     }
     return authProviders;
   }
-  
-  render(){
-    let flagShowOR = !this.props.userCredentialsEnabled || this.props.authProviders.length === 0;
-    
-    return(
+
+  render() {
+    let flagShowOR =
+      !this.props.userCredentialsEnabled ||
+      this.props.authProviders.length === 0;
+
+    return (
       <div className="hold-transition login-page">
         <div className="login-box">
           <div className="login-logo">
-            <b>{this.props.logoTitle}</b>
+            <b>
+              {this.props.logoTitle}
+            </b>
           </div>
           <div className="login-box-body">
-            <p className="login-box-msg">{this.props.boxMessage}</p>
+            <p className="login-box-msg">
+              {this.props.boxMessage}
+            </p>
             {this.renderUserCredentialsEnabled()}
             <div className="social-auth-links text-center">
-              {
-                !flagShowOR ? <p>- OR -</p> : ''
-              }
+              {!flagShowOR ? <p>- OR -</p> : ""}
               {this.renderAuthProviders()}
             </div>
-            {
-              this.props.userCredentialsEnabled ? <a href="#">I forgot my password</a> : ''
-            }
-            <br/>
-            <a href="#" className="text-center">Register a new membership</a>
+            {this.props.userCredentialsEnabled
+              ? <a href="#">I forgot my password</a>
+              : ""}
+            <br />
+            <a href="#" className="text-center">
+              Register a new membership
+            </a>
           </div>
         </div>
       </div>
@@ -106,7 +130,7 @@ Login.defaultProps = {
   logoTitle: "Login Page",
   boxMessage: "Sign in to start your session",
   userCredentialsEnabled: true,
-  authProviders: ["facebook","google"]
-}
+  authProviders: ["facebook", "google", "gitlab"]
+};
 
-export default  Login;
+export default Login;
