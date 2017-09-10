@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Checkbox } from "react-icheck";
+import rp from 'request-promise';
 import "./Login.css";
 
 let providers = {
@@ -23,23 +24,59 @@ let providers = {
 class Login extends Component {
   constructor(props) {
     super(props);
+    
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    
+    this.state = {
+      username: '',
+      password: ''
+    }
   }
-
-  renderUserCredentialsEnabled() {
-    if (this.props.userCredentialsEnabled) {
+  
+  handleChange(e) {
+    const target = e.target;
+    const name = target.name;
+    this.setState({
+      [name]: target.value
+    });
+  }
+  
+  handleSubmit(e){
+    e.preventDefault();
+    const options = {
+      uri: this.props.apiAuthorization,
+      qs: {
+        grant_type: "password",
+        username: this.state.username,
+        password: this.state.password,
+        client_id: "web"
+      },
+      json: true
+    }
+    rp(options)
+      .then(token => {
+        localStorage.set("token", token);
+        if(this.props.redirectUrl){
+          window.location.href = this.props.redirectUrl;
+        }
+      })
+      .catch( error => {
+        console.error(error);
+      });
+  }
+  
+  renderUserCredentialsEnabled(){
+    if(this.props.userCredentialsEnabled){
       return (
-        <form action="#" method="post">
+        <form onSubmit={this.handleSubmit}>
           <div className="form-group has-feedback">
-            <input type="email" className="form-control" placeholder="Email" />
-            <span className="glyphicon glyphicon-envelope form-control-feedback" />
+            <input type="text" className="form-control" placeholder="Username" name="username" onChange={this.handleChange}></input>
+            <span className="glyphicon glyphicon-user form-control-feedback"></span>
           </div>
           <div className="form-group has-feedback">
-            <input
-              type="password"
-              className="form-control"
-              placeholder="Password"
-            />
-            <span className="glyphicon glyphicon-lock form-control-feedback" />
+            <input type="password" className="form-control" placeholder="Password" name="password" onChange={this.handleChange}></input>
+            <span className="glyphicon glyphicon-lock form-control-feedback"></span>
           </div>
           <div className="row">
             <div className="col-xs-8">
@@ -130,7 +167,9 @@ Login.defaultProps = {
   logoTitle: "Login Page",
   boxMessage: "Sign in to start your session",
   userCredentialsEnabled: true,
-  authProviders: ["facebook", "google", "gitlab"]
-};
+  authProviders: ["facebook", "google", "gitlab"],
+  apiAuthorization: "",
+  redirectUrl: ""
+}
 
-export default Login;
+export default  Login;
