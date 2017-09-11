@@ -45,14 +45,17 @@ class Login extends Component {
   handleSubmit(e){
     e.preventDefault();
     const options = {
-      uri: this.props.apiAuthorization,
-      qs: {
+      method: "POST",
+      uri: this.props.tokenUrl,
+      formData: {
         grant_type: "password",
         username: this.state.username,
         password: this.state.password,
-        client_id: this.props.client_id
+        scope: this.props.scope
       },
-      json: true
+      headers: {
+        "content-type":"application/x-www-form-urlencoded"
+      }
     }
     rp(options)
       .then(token => {
@@ -169,9 +172,11 @@ Login.defaultProps = {
   boxMessage: "Sign in to start your session",
   userCredentialsEnabled: true,
   authProviders: ["facebook", "google", "gitlab"],
-  apiAuthorization: "",
+  authUrl: "",
+  tokenUrl: "",
   redirectUrl: "",
-  client_id: ""
+  client_id: "",
+  scope: ""
 }
 
 export default Login;
