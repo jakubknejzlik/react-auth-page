@@ -50,7 +50,7 @@ class Login extends Component {
         grant_type: "password",
         username: this.state.username,
         password: this.state.password,
-        client_id: "web"
+        client_id: this.props.client_id
       },
       json: true
     }
@@ -58,11 +58,12 @@ class Login extends Component {
       .then(token => {
         localStorage.set("token", token);
         if(this.props.redirectUrl){
-          window.location.href = this.props.redirectUrl;
+          window.location.href = `${this.props.redirectUrl}?access_token=${token}`;
         }
       })
       .catch( error => {
         console.error(error);
+        alert(error.message);
       });
   }
   
@@ -169,7 +170,8 @@ Login.defaultProps = {
   userCredentialsEnabled: true,
   authProviders: ["facebook", "google", "gitlab"],
   apiAuthorization: "",
-  redirectUrl: ""
+  redirectUrl: "",
+  client_id: ""
 }
 
-export default  Login;
+export default Login;
