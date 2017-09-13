@@ -29,8 +29,8 @@ class Login extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     
     this.state = {
-      username: 'test@novacloud.cz',
-      password: 'test',
+      username: '',
+      password: '',
       getTokenError: false,
       getTokenErrorMessage: ''
     }
@@ -65,12 +65,13 @@ class Login extends Component {
     
     rp(options)
       .then(response => {
-        const token = response.access_token;
+        const access_token = response.access_token;
         const token_type = response.token_type;
         this.changeStatusGetTokenError(false);
-        localStorage.setItem("token", `${token_type} ${token}`);
+        localStorage.setItem("access_token", access_token);
+        localStorage.setItem("token_type", token_type);
         if(this.props.redirectUrl){
-          window.location.href = `${this.props.redirectUrl}?access_token=${token}`;
+          window.location.href = `${this.props.redirectUrl}?access_token=${access_token}`;
         }
       })
       .catch( error => {
@@ -206,11 +207,11 @@ Login.defaultProps = {
   userCredentialsEnabled: true,
   authProviders: ["facebook", "google", "gitlab"],
   authUrl: "",
-  tokenUrl: "https://novacloud.eu.auth0.com/oauth/token",
+  tokenUrl: "",
   redirectUrl: "",
-  client_id: "mhjoWWbu6ByAfXKt73jMqNMjoFpA8vyQ",
+  client_id: "",
   scope: "email",
-  audience: "https://novacloud.eu.auth0.com/api/v2/",
+  audience: "",
 }
 
 export default Login;
