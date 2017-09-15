@@ -30,7 +30,9 @@ class Login extends Component {
     
     this.state = {
       username: '',
-      password: ''
+      password: '',
+      getTokenError: false,
+      getTokenErrorMessage: ''
     }
   }
   
@@ -46,27 +48,35 @@ class Login extends Component {
     e.preventDefault();
     const options = {
       method: "POST",
-      uri: this.props.tokenUrl,
-      formData: {
+      url: this.props.tokenUrl,
+      headers: {
+        "content-type":"application/json"
+      },
+      body: {
         grant_type: "password",
         username: this.state.username,
         password: this.state.password,
-        scope: this.props.scope
+        audience: this.props.audience,
+        scope: this.props.scope,
+        client_id: this.props.client_id
       },
-      headers: {
-        "content-type":"application/x-www-form-urlencoded"
-      }
-    }
+      json: true
+    };
+    
     rp(options)
-      .then(token => {
-        localStorage.set("token", token);
+      .then(response => {
+        const access_token = response.access_token;
+        const token_type = response.token_type;
+        this.changeStatusGetTokenError(false);
+        localStorage.setItem("access_token", access_token);
+        localStorage.setItem("token_type", token_type);
         if(this.props.redirectUrl){
-          window.location.href = `${this.props.redirectUrl}?access_token=${token}`;
+          window.location.href = `${this.props.redirectUrl}?access_token=${access_token}`;
         }
       })
       .catch( error => {
         console.error(error);
-        alert(error.message);
+        this.changeStatusGetTokenError(true, error.error.error_description);
       });
   }
   
@@ -75,11 +85,11 @@ class Login extends Component {
       return (
         <form onSubmit={this.handleSubmit}>
           <div className="form-group has-feedback">
-            <input type="text" className="form-control" placeholder="Username" name="username" onChange={this.handleChange}></input>
+            <input type="text" className="form-control" placeholder="Username" name="username" onChange={this.handleChange} value={this.state.username}></input>
             <span className="glyphicon glyphicon-user form-control-feedback"></span>
           </div>
           <div className="form-group has-feedback">
-            <input type="password" className="form-control" placeholder="Password" name="password" onChange={this.handleChange}></input>
+            <input type="password" className="form-control" placeholder="Password" name="password" onChange={this.handleChange} value={this.state.password}></input>
             <span className="glyphicon glyphicon-lock form-control-feedback"></span>
           </div>
           <div className="row">
@@ -131,6 +141,29 @@ class Login extends Component {
     return authProviders;
   }
 
+  renderCalloutError(){
+    if(this.state.getTokenError){
+      return (
+        <span>
+          <br/>
+          <div className="callout callout-danger">
+            <h4>Error</h4>
+            <p>{this.state.getTokenErrorMessage}</p>
+          </div>
+        </span>
+      );
+    } else {
+      return '';
+    }
+  }
+  
+  changeStatusGetTokenError(getTokenError, getTokenErrorMessage = ''){
+    this.setState({
+      getTokenError,
+      getTokenErrorMessage
+    })
+  }
+  
   render() {
     let flagShowOR =
       !this.props.userCredentialsEnabled ||
@@ -149,6 +182,7 @@ class Login extends Component {
               {this.props.boxMessage}
             </p>
             {this.renderUserCredentialsEnabled()}
+            {this.renderCalloutError()}
             <div className="social-auth-links text-center">
               {!flagShowOR ? <p>- OR -</p> : ""}
               {this.renderAuthProviders()}
@@ -176,7 +210,8 @@ Login.defaultProps = {
   tokenUrl: "",
   redirectUrl: "",
   client_id: "",
-  scope: ""
+  scope: "email",
+  audience: "",
 }
 
 export default Login;
