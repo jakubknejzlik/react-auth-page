@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Checkbox } from "react-icheck";
 import rp from 'request-promise';
-import "./Login.css";
+import "../Login.css";
 
 let providers = {
   facebook: {
@@ -21,9 +21,9 @@ let providers = {
   }
 };
 
-class Login extends Component {
-  constructor(props) {
-    super(props);
+class LoginComponent extends Component {
+  constructor(props, context) {
+    super(props, context);
     
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -33,7 +33,7 @@ class Login extends Component {
       password: '',
       getTokenError: false,
       getTokenErrorMessage: ''
-    }
+    };
   }
   
   handleChange(e) {
@@ -71,7 +71,7 @@ class Login extends Component {
         localStorage.setItem("access_token", access_token);
         localStorage.setItem("token_type", token_type);
         if(this.props.redirectUrl){
-          window.location.href = `${this.props.redirectUrl}?access_token=${access_token}`;
+          this.context.router.history.push(`${this.props.redirectUrl}?access_token=${access_token}`)
         }
       })
       .catch( error => {
@@ -125,6 +125,7 @@ class Login extends Component {
         if (providers[provider]) {
           return (
             <a
+              key={provider}
               href="#"
               className={`btn btn-block btn-social ${providers[provider]
                 .classNameButton} btn-flat`}
@@ -201,7 +202,11 @@ class Login extends Component {
   }
 }
 
-Login.defaultProps = {
+LoginComponent.contextTypes = {
+  router: React.PropTypes.object
+}
+
+LoginComponent.defaultProps = {
   logoTitle: "Login Page",
   boxMessage: "Sign in to start your session",
   userCredentialsEnabled: true,
@@ -214,4 +219,4 @@ Login.defaultProps = {
   audience: "",
 }
 
-export default Login;
+export default LoginComponent;
