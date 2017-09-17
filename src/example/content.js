@@ -1,7 +1,12 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import "../Login.css";
 
 class Content extends React.Component{
+  constructor(props, context){
+    super(props, context);
+  }
+  
   render(){
     const access_token = localStorage.getItem('access_token');
     return(
@@ -21,9 +26,7 @@ class Content extends React.Component{
               
               </div>
               <div className="col-xs-4">
-                <button className="btn btn-primary btn-block btn-flat" >
-                  Sign out
-                </button>
+                <Link className="btn btn-primary btn-block btn-flat" to="/logout">Logout</Link>
               </div>
             </div>
             
@@ -33,6 +36,10 @@ class Content extends React.Component{
       </div>
     );
   }
+}
+
+Content.contextTypes = {
+  router: React.PropTypes.object
 }
 
 export default Content;
