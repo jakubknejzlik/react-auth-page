@@ -2,6 +2,7 @@
   "name": "react-auth-page",
   "version": "0.1.0",
   "private": true,
+  "homepage": "./",
   "dependencies": {
     "admin-lte": "^2.3.11",
     "bootstrap": "3",

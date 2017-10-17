@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Checkbox } from "react-icheck";
-import rp from 'request-promise';
+import rp from "request-promise";
+import Logout from "./logout";
 import "./Login.css";
 
 let providers = {
@@ -24,18 +25,18 @@ let providers = {
 class Login extends Component {
   constructor(props) {
     super(props);
-    
+
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    
+
     this.state = {
-      username: '',
-      password: '',
+      username: "",
+      password: "",
       getTokenError: false,
-      getTokenErrorMessage: ''
-    }
+      getTokenErrorMessage: ""
+    };
   }
-  
+
   handleChange(e) {
     const target = e.target;
     const name = target.name;
@@ -43,14 +44,14 @@ class Login extends Component {
       [name]: target.value
     });
   }
-  
-  handleSubmit(e){
+
+  handleSubmit(e) {
     e.preventDefault();
     const options = {
       method: "POST",
       url: this.props.tokenUrl,
       headers: {
-        "content-type":"application/json"
+        "content-type": "application/json"
       },
       body: {
         grant_type: "password",
@@ -62,7 +63,7 @@ class Login extends Component {
       },
       json: true
     };
-    
+
     rp(options)
       .then(response => {
         const access_token = response.access_token;
@@ -70,27 +71,42 @@ class Login extends Component {
         this.changeStatusGetTokenError(false);
         localStorage.setItem("access_token", access_token);
         localStorage.setItem("token_type", token_type);
-        if(this.props.redirectUrl){
-          window.location.href = `${this.props.redirectUrl}?access_token=${access_token}`;
+        if (this.props.redirectUrl) {
+          window.location = `${this.props
+            .redirectUrl}?access_token=${access_token}`;
         }
       })
-      .catch( error => {
+      .catch(error => {
         console.error(error);
         this.changeStatusGetTokenError(true, error.error.error_description);
       });
   }
-  
-  renderUserCredentialsEnabled(){
-    if(this.props.userCredentialsEnabled){
+
+  renderUserCredentialsEnabled() {
+    if (this.props.userCredentialsEnabled) {
       return (
         <form onSubmit={this.handleSubmit}>
           <div className="form-group has-feedback">
-            <input type="text" className="form-control" placeholder="Username" name="username" onChange={this.handleChange} value={this.state.username}></input>
-            <span className="glyphicon glyphicon-user form-control-feedback"></span>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Username"
+              name="username"
+              onChange={this.handleChange}
+              value={this.state.username}
+            />
+            <span className="glyphicon glyphicon-user form-control-feedback" />
           </div>
           <div className="form-group has-feedback">
-            <input type="password" className="form-control" placeholder="Password" name="password" onChange={this.handleChange} value={this.state.password}></input>
-            <span className="glyphicon glyphicon-lock form-control-feedback"></span>
+            <input
+              type="password"
+              className="form-control"
+              placeholder="Password"
+              name="password"
+              onChange={this.handleChange}
+              value={this.state.password}
+            />
+            <span className="glyphicon glyphicon-lock form-control-feedback" />
           </div>
           <div className="row">
             <div className="col-xs-8">
@@ -134,18 +150,18 @@ class Login extends Component {
             </a>
           );
         } else {
-          return;
+          return "";
         }
       });
     }
     return authProviders;
   }
 
-  renderCalloutError(){
-    if(this.state.getTokenError){
+  renderCalloutError() {
+    if (this.state.getTokenError) {
       return (
         <span>
-          <br/>
+          <br />
           <div className="callout callout-danger">
             <h4>Error</h4>
             <p>{this.state.getTokenErrorMessage}</p>
@@ -153,18 +169,22 @@ class Login extends Component {
         </span>
       );
     } else {
-      return '';
+      return "";
     }
   }
-  
-  changeStatusGetTokenError(getTokenError, getTokenErrorMessage = ''){
+
+  changeStatusGetTokenError(getTokenError, getTokenErrorMessage = "") {
     this.setState({
       getTokenError,
       getTokenErrorMessage
-    })
+    });
   }
-  
+
   render() {
+    if (window.location.search.indexOf("?logout") !== -1) {
+      return <Logout />;
+    }
+
     let flagShowOR =
       !this.props.userCredentialsEnabled ||
       this.props.authProviders.length === 0;
@@ -173,23 +193,21 @@ class Login extends Component {
       <div className="hold-transition login-page">
         <div className="login-box">
           <div className="login-logo">
-            <b>
-              {this.props.logoTitle}
-            </b>
+            <b>{this.props.logoTitle}</b>
           </div>
           <div className="login-box-body">
-            <p className="login-box-msg">
-              {this.props.boxMessage}
-            </p>
+            <p className="login-box-msg">{this.props.boxMessage}</p>
             {this.renderUserCredentialsEnabled()}
             {this.renderCalloutError()}
             <div className="social-auth-links text-center">
               {!flagShowOR ? <p>- OR -</p> : ""}
               {this.renderAuthProviders()}
             </div>
-            {this.props.userCredentialsEnabled
-              ? <a href="#">I forgot my password</a>
-              : ""}
+            {this.props.userCredentialsEnabled ? (
+              <a href="#">I forgot my password</a>
+            ) : (
+              ""
+            )}
             <br />
             <a href="#" className="text-center">
               Register a new membership
@@ -202,16 +220,18 @@ class Login extends Component {
 }
 
 Login.defaultProps = {
-  logoTitle: "Login Page",
-  boxMessage: "Sign in to start your session",
-  userCredentialsEnabled: true,
-  authProviders: ["facebook", "google", "gitlab"],
-  authUrl: "",
-  tokenUrl: "",
-  redirectUrl: "",
-  client_id: "",
-  scope: "email",
-  audience: "",
-}
+  logoTitle: window.APP_CONFIG.REACT_APP_TITLE,
+  boxMessage: window.APP_CONFIG.REACT_APP_SUBTITLE,
+  userCredentialsEnabled: window.APP_CONFIG.REACT_APP_USER_CREDENTIALS_ENABLED,
+  authProviders: [
+    /*"facebook", "google", "gitlab"*/
+  ],
+  authUrl: window.APP_CONFIG.REACT_APP_OAUTH_AUTH_URL,
+  tokenUrl: window.APP_CONFIG.REACT_APP_OAUTH_TOKEN_URL,
+  redirectUrl: window.APP_CONFIG.REACT_APP_OAUTH_REDIRECT_URL,
+  client_id: window.APP_CONFIG.REACT_APP_OAUTH_CLIENT_ID,
+  scope: window.APP_CONFIG.REACT_APP_OAUTH_SCOPE,
+  audience: window.APP_CONFIG.REACT_APP_OAUTH_AUDIENCE
+};
 
 export default Login;
